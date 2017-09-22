@@ -5,7 +5,7 @@
   <!-- {{this.current_conditions.timezone}} -->
 
 
-    <div v-if="!loading">
+    <div v-if="loading">
               <div class="preloader" style="opacity: 1; ">
                   <svg version="1.1" id="sun" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="10px" height="10px" viewBox="0 0 10 10" enable-background="new 0 0 10 10" xml:space="preserve" style="opacity: 1; margin-left: 0px; margin-top: 0px;">
                   <g>
@@ -51,7 +51,7 @@
 
   <!-- {{this.current_conditions.hourly.summary}} <br><br> -->
 
-   <div v-if="loading">
+   <div v-if="!loading">
       <section class="sectionone">
 
           <!--logo section starts here-->
@@ -77,7 +77,7 @@
 
                           <h2 class="temperature">{{this.current_conditions.currently.temperature}}° C</h2>
                           <p class="weathercondition">{{this.current_conditions.currently.summary}}</p>
-                          <i class="lastupdate">Last updated at 5 minutes ago </i>
+                          <i class="lastupdate">Last updated <timeago :since="current_conditions.currently.time * 1000"></timeago> </i>
                       </div>
 
                   </div>
@@ -86,7 +86,8 @@
               </div>
               <div class="nine wide column location">
                   <h2 class="city">Hyderabad</h2>
-                  <p class="date">Wed, &nbsp;20th Sept 2017</p>
+                  <!-- <p class="date">Wed, &nbsp;20th Sept 2017</p> -->
+                  <p class="date">{{ computed_date }}</p>
               </div>
 
 
@@ -183,9 +184,9 @@
 
   export default {
 
-    data: function () {
+    data() {
       return {
-        loading: false,
+        loading: true,
         userLat: '',
         userLng: '',
         current_conditions :{
@@ -198,6 +199,7 @@
                  icon :'',
                  humidity:'',
                  pressure:'',
+                 time: ''
 
                }
             ],
@@ -210,6 +212,16 @@
 
 
             ]
+        }
+      }
+    },
+
+    computed: {
+      computed_date: function(){
+        try{
+          return new Date(this.current_conditions.currently.time * 1000).toDateString();
+        }catch(err){
+          return ''
         }
       }
     },
@@ -272,17 +284,16 @@
         this.loading = true;
 
 
-        this.$Progress.start()
-
         this.$http.get('https://api.darksky.net/forecast/af6ffccfc574f03335a9644c19aa3b3f/' + this.userLat + ',' + this.userLng + '?units=si')
           .then(response => {
 
               this.current_conditions =  response.body;
-                this.$Progress.finish()
+              this.loading = false;
+
 
           }, error => {
                console.log(failed);
-                 this.$Progress.fail()
+                this.fetch_current_conditions();
 
           });
 
