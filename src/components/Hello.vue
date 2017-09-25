@@ -77,7 +77,9 @@
 
                           <h2 class="temperature">{{this.current_conditions.currently.temperature}}° C</h2>
                           <p class="weathercondition">{{this.current_conditions.currently.summary}}</p>
-                          <i class="lastupdate">Last updated <timeago :since="current_conditions.currently.time * 1000"></timeago> </i>
+                          <i class="lastupdate">Last updated <timeago :since="current_conditions.currently.time * 1000" :auto-update="60"></timeago>
+                            <span v-on:click="askGeolocation()" style="cursor:pointer;"><i class="refresh icon"></i></span> 
+                          </i>
                       </div>
 
                   </div>
@@ -88,6 +90,8 @@
                   <h2 class="city">Hyderabad</h2>
                   <!-- <p class="date">Wed, &nbsp;20th Sept 2017</p> -->
                   <p class="date">{{ computed_date }}</p>
+
+
               </div>
 
 
